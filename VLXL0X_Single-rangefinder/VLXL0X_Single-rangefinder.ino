@@ -1,4 +1,4 @@
-#include <Adafruit_VL53L0X.h>
+//#include <Adafruit_VL53L0X.h>
 
 /* This example shows how to get single-shot range
  measurements from the VL53L0X. The sensor can optionally be
@@ -22,7 +22,7 @@ VL53L0X sensor;
 // other than the intended target. It works best in dark
 // conditions.
 
-//#define LONG_RANGE
+#define LONG_RANGE
 
 
 // Uncomment ONE of these two lines to get
@@ -30,15 +30,17 @@ VL53L0X sensor;
 // - higher accuracy at the cost of lower speed
 
 //#define HIGH_SPEED
-#define HIGH_ACCURACY
+//#define HIGH_ACCURACY
 
+//Set the maximum range - 8.190 meters converted to inches.
+float maxRange = 8190 * 0.0393701;
 
 void setup()
 {
   Serial.begin(9600);
   Wire.begin();
   sensor.init();
-  //sensor.setTimeout(5000);
+  sensor.setTimeout(500);
 
 #if defined LONG_RANGE
   // lower the return signal rate limit (default is 0.25 MCPS)
@@ -48,51 +50,26 @@ void setup()
   sensor.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
 #endif
 
-#if defined HIGH_SPEED
-  // reduce timing budget to 20 ms (default is about 33 ms)
-  sensor.setMeasurementTimingBudget(20000);
-#elif defined HIGH_ACCURACY
-  // increase timing budget to 200 ms
-  sensor.setMeasurementTimingBudget(200000);
-#endif
-pinMode(A0,INPUT);
-pinMode(A1,INPUT);
-pinMode(A2,INPUT);
-pinMode(A3,INPUT);
-
+//Set the timing budget to 100ms - a midpoint between speed and accuracy.
+ sensor.setMeasurementTimingBudget(100000);
 }
 
 void loop()
 {
-  
-float sensor0v = analogRead(A0);
-float sensor1v = analogRead(A1);
-float sensor2v = analogRead(A2);
-float sensor3v = analogRead(A3);
+  float tt = sensor.readRangeSingleMillimeters();
+  //Convert to inches
+  tt = tt * 0.0393701;
 
-sensor0v = sensor0v * 0.497;
-sensor1v = sensor1v * 0.497;
-sensor2v = sensor2v * 0.497;
-sensor3v = sensor3v * 0.497;
-int tt = sensor.readRangeSingleMillimeters();
+  if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+  if (tt < (maxRange) ) 
+  {
+    //Serial.print(" Measure : "); 
+    Serial.println(tt);
+  }
 
-   if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
-  if (tt < 8190 ) {
-  //Serial.print(" Measure : "); 
-  Serial.print(tt);
-  Serial.print("|");
-  Serial.print(tt * .0393701 * .9);Serial.print("|");
-  Serial.print(sensor0v);Serial.print("|");
-  Serial.print(sensor1v);Serial.print("|");
-  Serial.print(sensor2v);Serial.print("|");
-  Serial.print(sensor3v);
-  Serial.println("");      // prints another carriage return
- 
-                  }
-  //                             then adds the carriage return with "println"
  if(Serial.available() > 0)
-{
- char letter = Serial.read();
+ {
+    char letter = Serial.read();
     if(letter == 'M')
     {
      digitalWrite(13,HIGH);
@@ -101,7 +78,7 @@ int tt = sensor.readRangeSingleMillimeters();
     {
      digitalWrite(13,LOW);
     }   
-}
+ }
 
  
 }
