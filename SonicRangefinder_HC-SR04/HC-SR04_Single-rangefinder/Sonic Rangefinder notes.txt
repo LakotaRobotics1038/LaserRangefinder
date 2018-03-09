@@ -1,0 +1,3 @@
+On the rangefinder connected on 3/8/2018 to the Arduino Uno, the pin/wire coloring is not following the standard convention for 5V and ground wires. This can be fixed by re-arranging the wires in the housing. 
+
+The sensor can work when connected to any of the digital pins, as long as those pins are specified for echo and trigger. Thus, it should be possible to connect the laser rangefinder and both sonic sensors to a single Arduino Nano board - as long as a breadboard or splitter is used for the 5V and Ground connections.
