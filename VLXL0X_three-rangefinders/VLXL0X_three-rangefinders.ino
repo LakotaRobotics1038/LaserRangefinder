@@ -37,9 +37,9 @@ float laserMaxRange = 8190 * 0.0393701;
 
 //Sonar Pins
 const int leftTRIG_PIN = 4;
-const int leftECHO_PIN = 3;
+const int leftECHO_PIN = 5;
 const int rightTRIG_PIN = 6;
-const int rightECHO_PIN = 5;
+const int rightECHO_PIN = 7;
 
 
 void setup()
@@ -48,7 +48,7 @@ void setup()
   Serial.begin(9600);
   Wire.begin();
   sensor.init();
-  sensor.setTimeout(500);
+  sensor.setTimeout(100);
 
 #if defined LONG_RANGE
   // lower the return signal rate limit (default is 0.25 MCPS)
@@ -81,7 +81,7 @@ void loop()
   if (laserTt < (laserMaxRange) ) 
   {
     //Serial.print(" Measure : "); 
-    //Serial.println(tt);
+    Serial.println(laserTt);
   }
 
  if(Serial.available() > 0)
@@ -97,7 +97,7 @@ void loop()
     }
  }
 
-
+Serial.println("Looping after laser portion");
 
  //Sonar distance sensing:
   unsigned long leftT1;
@@ -110,12 +110,13 @@ void loop()
   float rightInches;
 
   digitalWrite(leftTRIG_PIN, HIGH);
-  delayMicroseconds(50);
+  delayMicroseconds(10);
   digitalWrite(leftTRIG_PIN, LOW);
+  
   digitalWrite(rightTRIG_PIN, HIGH);
-  delayMicroseconds(50);
+  delayMicroseconds(10);
   digitalWrite(rightTRIG_PIN, LOW);
-
+  
 //Left
   //wait for pulse on left pin
   while ( digitalRead(leftECHO_PIN) == 0 );
@@ -127,7 +128,6 @@ void loop()
   leftInches = leftPulse_width / 148.0;
 
 //Right
-
   while ( digitalRead(rightECHO_PIN) == 0 );
   // Measure how long the echo pin was held high (pulse width)
   rightT1 = micros();
@@ -141,14 +141,17 @@ void loop()
 //Output results:
   String output = "Front: ";
   output.concat(laserTt);
+  
   output.concat("; Left: ");
   output.concat(leftInches);
+  
   output.concat("; Right: ");
   output.concat(rightInches);
+  
   Serial.println(output);
 
 //Wait before running again
-  delay(100);
+  delay(200);
 
 }
 

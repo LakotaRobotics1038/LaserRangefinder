@@ -1,6 +1,6 @@
 // Pins
 const int TRIG_PIN = 4;
-const int ECHO_PIN = 3;
+const int ECHO_PIN = 5;
 
 
 
